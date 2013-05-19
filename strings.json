@@ -1,0 +1,8 @@
+{
+    "migrated_quotes": {
+        "en": "Migrated {migrated} quotes from {categories}."
+    },
+    "no_old_quotes": {
+        "en": "Error: No quotes found for migration."
+    }
+}
