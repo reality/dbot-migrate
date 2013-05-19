@@ -1,6 +1,7 @@
 ## Migrate
 
-Migrate DBot data between versions.
+Migrate DBot data between versions. Please note, I have not tested this at all
+yet, as it's still in development.
 
 ### Description
 
