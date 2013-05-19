@@ -23,6 +23,36 @@ var migrate = function(dbot) {
             } else {
                 event.reply(dbot.t('no_old_quotes'));
             }
+        },
+
+        '~migratepolls': function(event) {
+            var oldPolls = dbot.db.polls;
+                migratedCount = 0;
+
+            if(oldPolls && oldPolls.length > 0) {
+                _.each(oldPolls, function(oldPoll, pollName) {
+                    dbot.api.users.resolveUser(event.server, oldPoll.owner, function(user) {
+                    dbot.modules.poll.db.create('poll', pollName, {
+                        'name': pollName,
+                        'description': oldPoll.description,
+                        'owner': user.id,
+                        'votes': oldPoll.votes,
+                        'votees': {}
+                    }, function(err, newPoll) {
+                        if(!err) {
+                            _.each(oldPoll.votees, function(choice, voterNick) {
+                                dbot.api.users.resolveUser(event.server, voterNick, function(user) {
+                                    newPoll.votees[user.id] = choice; 
+                                });
+                            });
+                        } else if(err == AlreadyExistsError) { // Probably anyway
+                            event.reply(dbot.t('cannot_migrate_poll_exists', { 'name': pollName })); 
+                        }
+                    });
+                });
+            } else {
+                event.reply(dbot.t('no_old_polls'));
+            }
         }
     };
 };
