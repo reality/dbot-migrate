@@ -1,6 +1,6 @@
 /**
  * Name: dbot-migrate
- * Description: Migrate DBot 0.4 data to DBot 0.5.
+ * Description: Migrate DBot 0.3 and 0.4-dev data to DBot 0.4.
  */
 
 var _.require('underscore');
@@ -12,12 +12,16 @@ var migrate = function(dbot) {
                 migratedCount = 0;
 
             if(oldQuotes && oldQuotes.length > 0) {
-                _.each(oldQuotes, function(quote, cat) {
-                    dbot.api.quotes.addQuote(cat, quote, event.user, function(res) { });
-                    migratedCount++;
+                _.each(oldQuotes, function(quotes, category) {
+                    async.eachSeries(quotes, function(quote) {
+                        dbot.api.quotes.addQuote(category, quote, event.user, function(res) {
+                            callback(null);
+                        });
+                    });
                 });
+
                 event.reply(dbot.t('migrated_quotes', {
-                    'migrated': migratedCount,
+                    'migrated': migrated,
                     'categories': oldQuotes.length
                 }));
             } else {
