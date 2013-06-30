@@ -3,7 +3,8 @@
  * Description: Migrate DBot 0.3 and 0.4-dev data to DBot 0.4.
  */
 
-var _.require('underscore');
+var _ = require('underscore')._,
+    async = require('async');
 
 var migrate = function(dbot) {
     this.commands = {
@@ -11,9 +12,12 @@ var migrate = function(dbot) {
             var oldQuotes = dbot.db.quoteArrs,
                 migratedCount = 0;
 
-            if(oldQuotes && oldQuotes.length > 0) {
+            if(oldQuotes && _.size(oldQuotes) > 0) {
+                event.reply(dbot.t('migrating_quotes', {'num': _.size(oldQuotes)}));
+
                 _.each(oldQuotes, function(quotes, category) {
-                    async.eachSeries(quotes, function(quote) {
+                    migratedCount += _.size(quotes);
+                    async.eachSeries(quotes, function(quote, callback) {
                         dbot.api.quotes.addQuote(category, quote, event.user, function(res) {
                             callback(null);
                         });
@@ -21,8 +25,8 @@ var migrate = function(dbot) {
                 });
 
                 event.reply(dbot.t('migrated_quotes', {
-                    'migrated': migrated,
-                    'categories': oldQuotes.length
+                    'migrated': migratedCount,
+                    'categories': _.size(oldQuotes)
                 }));
             } else {
                 event.reply(dbot.t('no_old_quotes'));
@@ -36,22 +40,23 @@ var migrate = function(dbot) {
             if(oldPolls && oldPolls.length > 0) {
                 _.each(oldPolls, function(oldPoll, pollName) {
                     dbot.api.users.resolveUser(event.server, oldPoll.owner, function(user) {
-                    dbot.modules.poll.db.create('poll', pollName, {
-                        'name': pollName,
-                        'description': oldPoll.description,
-                        'owner': user.id,
-                        'votes': oldPoll.votes,
-                        'votees': {}
-                    }, function(err, newPoll) {
-                        if(!err) {
-                            _.each(oldPoll.votees, function(choice, voterNick) {
-                                dbot.api.users.resolveUser(event.server, voterNick, function(user) {
-                                    newPoll.votees[user.id] = choice; 
+                        dbot.modules.poll.db.create('poll', pollName, {
+                            'name': pollName,
+                            'description': oldPoll.description,
+                            'owner': user.id,
+                            'votes': oldPoll.votes,
+                            'votees': {}
+                        }, function(err, newPoll) {
+                            if(!err) {
+                                _.each(oldPoll.votees, function(choice, voterNick) {
+                                    dbot.api.users.resolveUser(event.server, voterNick, function(user) {
+                                        newPoll.votees[user.id] = choice; 
+                                    });
                                 });
-                            });
-                        } else if(err == AlreadyExistsError) { // Probably anyway
-                            event.reply(dbot.t('cannot_migrate_poll_exists', { 'name': pollName })); 
-                        }
+                            } else if(err == AlreadyExistsError) { // Probably anyway
+                                event.reply(dbot.t('cannot_migrate_poll_exists', { 'name': pollName })); 
+                            }
+                        });
                     });
                 });
             } else {

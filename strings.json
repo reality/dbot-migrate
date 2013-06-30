@@ -1,6 +1,9 @@
 {
+    "migrating_quotes": {
+        "en": "Migrating quotes from {num} categories..."
+    },
     "migrated_quotes": {
-        "en": "Migrated {migrated} quotes from {categories}."
+        "en": "Finished migrating {migrated} quotes from {categories} categories."
     },
     "no_old_quotes": {
         "en": "Error: No quotes found for migration."
