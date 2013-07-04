@@ -4,6 +4,7 @@
  */
 
 var _ = require('underscore')._,
+    fs = require('fs'),
     async = require('async');
 
 var migrate = function(dbot) {
@@ -30,6 +31,29 @@ var migrate = function(dbot) {
                 }));
             } else {
                 event.reply(dbot.t('no_old_quotes'));
+            }
+        },
+
+        '~migrateconfig': function(event) {
+            var oldConfig = dbot.db.config,
+                modules = fs.readdirSync('modules');
+
+            if(!dbot.config.modules) {
+                dbot.config.modules = {};
+            }
+
+            if(!_.isUndefined(oldConfig)) {
+                _.each(oldConfig, function(item, key) {
+                    if(_.include(modules, key)) {
+                        dbot.config.modules[key] = item; 
+                    } else {
+                        dbot.config[key] = item;
+                    }
+                });
+                dbot.modules.admin.internalAPI.saveConfig();
+                event.reply(dbot.t('migrated_config', { 'count': migrated }));
+            } else {
+                event.reply(dbot.t('no_old_config'));
             }
         },
 

@@ -7,5 +7,11 @@
     },
     "no_old_quotes": {
         "en": "Error: No quotes found for migration."
+    },
+    "no_old_config": {
+        "en": "Error: No old config found for migration"
+    },
+    "migrated_config": {
+        "en": "Migrated {count} first-class config keys..."
     }
 }
