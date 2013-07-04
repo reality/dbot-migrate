@@ -51,7 +51,7 @@ var migrate = function(dbot) {
                     }
                 });
                 dbot.modules.admin.internalAPI.saveConfig();
-                event.reply(dbot.t('migrated_config', { 'count': migrated }));
+                event.reply(dbot.t('migrated_config', { 'count': 'n/a' }));
             } else {
                 event.reply(dbot.t('no_old_config'));
             }
