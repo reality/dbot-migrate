@@ -45,9 +45,9 @@ var migrate = function(dbot) {
             if(!_.isUndefined(oldConfig)) {
                 _.each(oldConfig, function(item, key) {
                     if(_.include(modules, key)) {
-                        dbot.config.modules[key] = item; 
+                        dbot.customConfig.modules[key] = item; 
                     } else {
-                        dbot.config[key] = item;
+                        dbot.customConfig[key] = item;
                     }
                 });
                 dbot.modules.admin.internalAPI.saveConfig();
