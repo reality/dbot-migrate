@@ -48,5 +48,4 @@ commands documented below to migrate your data to the new data format.
 
 ### Commands
 
-#### ~migratequotes
 
